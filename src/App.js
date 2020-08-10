@@ -1,26 +1,79 @@
-import React from 'react';
-import logo from './logo.svg';
+import React, { useState, useEffect } from 'react';
 import './App.css';
+import Header from './components/Header';
+import Figure from './components/Figure';
+import WrongLetter from './components/WrongLetter';
+import Word from './components/Word';
+import Notification from './components/Notification';
+import Popup from './components/Popup';
+import {showNotification as show} from './helper/helper';
+
+
+const words = ['application', 'programming', 'interface', 'wizard'];
+let selectedWord = words[Math.floor(Math.random() * words.length)];
 
 function App() {
+  const [playable, setPlayable] = useState(true); //set state;
+  const [correctLetters, setCorrectLetters] = useState([]);
+  const [wrongLetters, setWrongLetters] = useState([]);
+  const [showNotification, setShowNotification] = useState(false);
+
+  useEffect( () => {
+    const handleKeydown = event => {
+      const { key, keyCode} = event;
+      if(playable && keyCode >= 65 && keyCode <= 90){
+        const letter = key.toLowerCase();
+
+        if(selectedWord.includes(letter)){
+          if(!correctLetters.includes(letter)){
+            setCorrectLetters(currentLetters => [...currentLetters, letter]);
+          }else{
+            //showNotification();
+            show(setShowNotification);
+          }
+        }else{
+          if(!wrongLetters.includes(letter)){
+            setWrongLetters(wrongLetters => [...wrongLetters, letter]);
+          }else{
+            //showNotification();
+            show(setShowNotification);
+          }
+        }
+      }
+    }
+
+    window.addEventListener('keydown', handleKeydown);
+
+    return () => window.removeEventListener('keydown', handleKeydown);
+  }, [correctLetters, wrongLetters, playable]);
+  // khai báo [] sau useEffect để hàm này chạy khi cái biến trong được khởi tạo
+  
+  function playAgain(){
+    setPlayable(true);
+    setCorrectLetters([]);
+    setWrongLetters([]);
+
+    const random = Math.floor(Math.random() * words.length);
+    selectedWord = words[random];
+  }
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <div>
+      <Header />
+      <div className="game-container">
+        <Figure wrongLetters={wrongLetters}/>
+        <WrongLetter wrongLetters={wrongLetters}/>
+        <Word  selectedWord={selectedWord} correctLetters={correctLetters} />
+      </div>
+      <Popup 
+        correctLetters={correctLetters}
+        wrongLetters= {wrongLetters}
+        selectedWord={selectedWord}
+        setPlayable={setPlayable}
+        playAgain={playAgain}
+      />
+      <Notification showNotification = {showNotification} />
     </div>
   );
-}
+} 
 
 export default App;

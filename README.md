@@ -1,5 +1,5 @@
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
-
+And learn from Traversy Media: https://www.youtube.com/watch?v=jj0W8tYX_q8 
 ## Available Scripts
 
 In the project directory, you can run:
